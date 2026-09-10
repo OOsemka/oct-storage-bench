@@ -136,7 +136,7 @@ export interface FioBenchConfig {
 export const FIO_DEFAULTS: FioBenchConfig = {
   storageClass: '',
   pvcSize: '10Gi',
-  workloads: ['rand-read', 'rand-write', 'rand-mixed', 'seq-read', 'seq-write', 'seq-mixed'],
+  workloads: [],
   ioDepth: 32,
   numJobs: 4,
 };
