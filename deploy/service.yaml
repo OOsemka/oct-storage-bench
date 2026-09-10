@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: oct-storage-bench
+  namespace: oct-storage-bench
+  labels:
+    app: oct-storage-bench
+    app.kubernetes.io/part-of: oct-storage-bench
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: plugin-serving-cert
+spec:
+  ports:
+    - name: 9443-tcp
+      protocol: TCP
+      port: 9443
+      targetPort: 9443
+  selector:
+    app: oct-storage-bench
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: benchmark-runner
+  namespace: oct-storage-bench
+  labels:
+    app: benchmark-runner
+    app.kubernetes.io/part-of: oct-storage-bench
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: benchmark-runner-serving-cert
+spec:
+  ports:
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+  selector:
+    app: benchmark-runner
+  type: ClusterIP

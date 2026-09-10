@@ -1,0 +1,8 @@
+FROM scratch
+
+COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY benchmark-runner /usr/local/bin/benchmark-runner
+
+USER 1001
+
+ENTRYPOINT ["benchmark-runner"]

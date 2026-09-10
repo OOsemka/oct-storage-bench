@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oct-storage-bench
+  namespace: oct-storage-bench
+  labels:
+    app: oct-storage-bench
+    app.kubernetes.io/part-of: oct-storage-bench
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oct-storage-bench
+  template:
+    metadata:
+      labels:
+        app: oct-storage-bench
+    spec:
+      containers:
+        - name: plugin
+          image: quay.io/cjanisze/oct-storage-bench:0.1.1-ocp4.22
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9443
+              protocol: TCP
+          volumeMounts:
+            - name: plugin-serving-cert
+              readOnly: true
+              mountPath: /var/serving-cert
+          resources:
+            requests:
+              cpu: 10m
+              memory: 50Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: plugin-serving-cert
+          secret:
+            secretName: plugin-serving-cert
+            defaultMode: 420
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benchmark-runner
+  namespace: oct-storage-bench
+  labels:
+    app: benchmark-runner
+    app.kubernetes.io/part-of: oct-storage-bench
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: benchmark-runner
+  template:
+    metadata:
+      labels:
+        app: benchmark-runner
+    spec:
+      serviceAccountName: benchmark-runner
+      containers:
+        - name: benchmark-runner
+          image: quay.io/cjanisze/oct-storage-bench-runner:0.1.1-ocp4.22
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: runner-serving-cert
+              readOnly: true
+              mountPath: /var/serving-cert
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: runner-serving-cert
+          secret:
+            secretName: benchmark-runner-serving-cert
+            defaultMode: 420
+      restartPolicy: Always

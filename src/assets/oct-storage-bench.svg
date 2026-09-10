@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Park bench icon  charming flat design for OCT Storage Bench -->
+  <!-- Back rest slats -->
+  <rect x="12" y="10" width="40" height="3.5" rx="1.5" fill="#B8860B"/>
+  <rect x="12" y="16" width="40" height="3.5" rx="1.5" fill="#DAA520"/>
+  <rect x="12" y="22" width="40" height="3.5" rx="1.5" fill="#B8860B"/>
+  <!-- Seat planks -->
+  <rect x="8" y="30" width="48" height="3.5" rx="1.5" fill="#DAA520"/>
+  <rect x="8" y="36" width="48" height="3.5" rx="1.5" fill="#B8860B"/>
+  <!-- Metal frame  left -->
+  <path d="M14 8v46" stroke="#4A5568" stroke-width="3" stroke-linecap="round"/>
+  <path d="M14 40L9 54" stroke="#4A5568" stroke-width="3" stroke-linecap="round"/>
+  <!-- Metal frame  right -->
+  <path d="M50 8v46" stroke="#4A5568" stroke-width="3" stroke-linecap="round"/>
+  <path d="M50 40l5 14" stroke="#4A5568" stroke-width="3" stroke-linecap="round"/>
+  <!-- Armrests -->
+  <rect x="8" y="28" width="8" height="3" rx="1.5" fill="#4A5568"/>
+  <rect x="48" y="28" width="8" height="3" rx="1.5" fill="#4A5568"/>
+  <!-- Ground shadow -->
+  <ellipse cx="32" cy="57" rx="24" ry="3" fill="#E2E8F0" opacity="0.5"/>
+</svg>

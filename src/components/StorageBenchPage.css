@@ -1,0 +1,333 @@
+/* Storage Bench. Prefix: sb- */
+/* Tile pattern matches Windows Builder WizardSection. */
+
+.sb-tabs {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-tile-stack {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+  max-width: 52rem;
+}
+
+/* ---- Tile (accordion section) ---- */
+
+.sb-tile {
+  border-bottom: 1px solid var(--pf-t--global--border--color--default, #d2d2d2);
+}
+
+.sb-tile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 0.25rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sb-tile-header:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.sb-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 2.25rem;
+  border-radius: 8px;
+  color: var(--pf-t--global--color--brand--default, #0066cc);
+  background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
+}
+
+.sb-tile-open .sb-tile-icon {
+  color: #fff;
+  background: var(--pf-t--global--color--brand--default, #0066cc);
+}
+
+.sb-tile-disabled .sb-tile-icon {
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+  background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
+}
+
+.sb-tile-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sb-tile-title {
+  display: block;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.sb-tile-desc {
+  display: block;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-tile-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.sb-tile-body {
+  padding: 0 0 1.25rem 3rem;
+}
+
+/* ---- Forms ---- */
+
+.sb-form-section {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-form-section + .sb-form-section {
+  margin-top: var(--pf-t--global--spacer--lg, 24px);
+}
+
+.sb-run-btn {
+  margin-top: var(--pf-t--global--spacer--lg, 24px);
+}
+
+.sb-results-section {
+  margin-top: var(--pf-t--global--spacer--lg, 24px);
+}
+
+.sb-comparison--improved {
+  color: var(--pf-t--global--color--status--success--default, #3e8635);
+}
+
+.sb-comparison--regressed {
+  color: var(--pf-t--global--color--status--danger--default, #c9190b);
+}
+
+.sb-comparison--unchanged {
+  color: var(--pf-t--global--color--status--info--default, #2b9af3);
+}
+
+.sb-workload-check {
+  margin-bottom: var(--pf-t--global--spacer--sm, 8px);
+}
+
+.sb-progress-section {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-progress-section .pf-v6-c-progress {
+  max-width: 40rem;
+}
+
+/* ---- Live output terminal ---- */
+
+.sb-live-output {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-live-output-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.sb-live-output-content {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: var(--pf-t--global--font--family--mono, 'Liberation Mono', monospace);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  min-height: 14rem;
+  max-height: 20rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-top: 0.35rem;
+}
+
+/* ---- ODF alert ---- */
+
+.sb-odf-alert {
+  max-width: 48rem;
+}
+
+/* ---- Community disclaimer ---- */
+
+.sb-community-disclaimer {
+  max-width: 48rem;
+}
+
+.sb-community-disclaimer + * {
+  margin-top: var(--pf-t--global--spacer--md, 16px);
+}
+
+/* ---- Workload summary in history ---- */
+
+.sb-workload-summary {
+  font-size: 0.85rem;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+}
+
+/* ---- Comparison mixed-type warning ---- */
+
+.sb-compare-mixed-warning {
+  margin-top: var(--pf-t--global--spacer--sm, 8px);
+  max-width: 48rem;
+}
+
+/* ---- Comparison bar charts ---- */
+
+.sb-compare-container {
+  max-width: 52rem;
+}
+
+.sb-compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-compare-warning {
+  padding: var(--pf-t--global--spacer--lg, 24px);
+}
+
+.sb-compare-group {
+  margin-bottom: var(--pf-t--global--spacer--lg, 24px);
+  padding-bottom: var(--pf-t--global--spacer--md, 16px);
+  border-bottom: 1px solid var(--pf-t--global--border--color--default, #d2d2d2);
+}
+
+.sb-compare-chart {
+  margin-top: var(--pf-t--global--spacer--sm, 8px);
+  margin-bottom: var(--pf-t--global--spacer--md, 16px);
+}
+
+.sb-compare-chart-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+}
+
+.sb-compare-bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.sb-compare-bar-label {
+  width: 100px;
+  font-size: 0.8rem;
+  text-align: right;
+  flex: 0 0 100px;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+}
+
+.sb-compare-bar-track {
+  flex: 1 1 auto;
+  background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
+  border-radius: 4px;
+  overflow: hidden;
+  height: 24px;
+}
+
+.sb-compare-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  transition: width 0.3s ease;
+  min-width: fit-content;
+}
+
+.sb-compare-bar-value {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sb-compare-best-label {
+  flex: 0 0 auto;
+}
+
+/* ---- Description column in history ---- */
+
+.sb-run-description {
+  font-size: 0.85rem;
+}
+
+.sb-run-description-empty {
+  font-size: 0.85rem;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+}
+
+/* ---- History table layout ---- */
+
+.sb-history-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.sb-history-table th {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid var(--pf-t--global--border--color--default, #d2d2d2);
+}
+
+/* No border on the last header cell */
+.sb-history-table th:last-child {
+  border-right: none;
+}
+
+.sb-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 1;
+}
+
+.sb-resize-handle:hover,
+.sb-resize-handle:active {
+  background-color: var(--pf-t--global--color--brand--default, #0066cc);
+  opacity: 0.5;
+}
+
+.sb-td-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Result detail modal ---- */
+
+.sb-result-detail {
+  padding: var(--pf-t--global--spacer--md, 1rem);
+}

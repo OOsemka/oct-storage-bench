@@ -1,0 +1,28 @@
+apiVersion: communitytools.io/v1alpha1
+kind: CommunityTool
+metadata:
+  name: oct-storage-bench
+spec:
+  displayName: Storage Bench
+  description: Storage benchmarking tool. Run RADOS bench and FIO workloads from the console.
+  category: storage
+  source: community
+  git: https://github.com/openshift-community-tools/oct-storage-bench
+  consolePlugin: oct-storage-bench
+  href: /community-tools/storage/bench
+  icon: tiles/oct-storage-bench.svg
+  defaultChannel: stable
+  channels:
+    stable: {}
+  versions:
+    - version: "0.1.1"
+      channel: stable
+      openshift: ["4.21"]
+      image: quay.io/cjanisze/oct-storage-bench:0.1.1-ocp4.21
+      gitRef: v0.1.1
+    - version: "0.1.1"
+      channel: stable
+      openshift: ["4.22"]
+      image: quay.io/cjanisze/oct-storage-bench:0.1.1-ocp4.22
+      gitRef: v0.1.1
+  minOpenShift: "4.21"

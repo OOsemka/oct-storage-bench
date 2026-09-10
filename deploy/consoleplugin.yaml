@@ -1,0 +1,21 @@
+apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: oct-storage-bench
+spec:
+  displayName: Storage Bench (Community Tools)
+  backend:
+    type: Service
+    service:
+      name: oct-storage-bench
+      namespace: oct-storage-bench
+      port: 9443
+      basePath: /
+  proxy:
+    - alias: benchmark-runner
+      endpoint:
+        type: Service
+        service:
+          name: benchmark-runner
+          namespace: oct-storage-bench
+          port: 8443

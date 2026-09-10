@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: benchmark-runner
+  namespace: oct-storage-bench
+  labels:
+    app.kubernetes.io/part-of: oct-storage-bench
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: oct-storage-bench
+  labels:
+    app.kubernetes.io/part-of: oct-storage-bench
+rules:
+  # Create and manage benchmark Jobs
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  # Read pods and pod logs for job monitoring
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  # Create/delete PVCs for FIO benchmarks
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "delete"]
+  # List StorageClasses for selector
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list"]
+  # Read Ceph secrets from openshift-storage (rook-ceph-mon)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  # Manage ConfigMaps for results storage and ceph config
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+  # Manage CephBlockPools for test pools and ODF detection
+  - apiGroups: ["ceph.rook.io"]
+    resources: ["cephblockpools", "cephclusters"]
+    verbs: ["get", "list", "create", "delete"]
+  # Read OCS StorageCluster for ODF detection
+  - apiGroups: ["ocs.openshift.io"]
+    resources: ["storageclusters"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: oct-storage-bench
+  labels:
+    app.kubernetes.io/part-of: oct-storage-bench
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: oct-storage-bench
+subjects:
+  - kind: ServiceAccount
+    name: benchmark-runner
+    namespace: oct-storage-bench
+---
+# RADOS bench Jobs run in openshift-storage so pods inherit Multus networking.
+# Scoped Role grants only the verbs the sidecar needs in that namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: oct-storage-bench-rados
+  namespace: openshift-storage
+  labels:
+    app.kubernetes.io/part-of: oct-storage-bench
+rules:
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "delete", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: oct-storage-bench-rados
+  namespace: openshift-storage
+  labels:
+    app.kubernetes.io/part-of: oct-storage-bench
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: oct-storage-bench-rados
+subjects:
+  - kind: ServiceAccount
+    name: benchmark-runner
+    namespace: oct-storage-bench
