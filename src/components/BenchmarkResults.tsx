@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Title,
@@ -9,11 +9,15 @@ import {
   Label,
   Flex,
   FlexItem,
+  Button,
+  Split,
+  SplitItem,
 } from '@patternfly/react-core';
 import {
   ArrowUpIcon,
   ArrowDownIcon,
   MinusIcon,
+  DownloadIcon,
 } from '@patternfly/react-icons';
 import {
   BenchmarkRun,
@@ -269,6 +273,74 @@ const FullLogSection: FC<{ logs?: string }> = ({ logs }) => {
   );
 };
 
+function buildDownloadContent(run: BenchmarkRun): string {
+  const lines: string[] = [];
+  lines.push(`Storage Bench — ${run.benchmarkType.toUpperCase()} Results`);
+  lines.push(`Date: ${new Date(run.timestamp).toLocaleString()}`);
+  lines.push(`Status: ${run.status}`);
+  if (run.description) lines.push(`Description: ${run.description}`);
+  lines.push('');
+
+  if (run.result) {
+    if (run.result.type === 'rados') {
+      const r = run.result as RadosBenchResult;
+      lines.push(`Pool: ${r.config.poolName}  |  PGs: ${r.config.pgCount}  |  Object size: ${r.config.objectSize}  |  Threads: ${r.config.threads}`);
+      lines.push('');
+      for (const t of r.results) {
+        const mode = t.mode === 'write' ? 'Write' : t.mode === 'seq' ? 'Sequential Read' : 'Random Read';
+        lines.push(`--- ${mode} ---`);
+        lines.push(`  Throughput:   ${t.throughputMBs.toFixed(2)} MB/s`);
+        lines.push(`  IOPS:         ${t.iops.toFixed(0)}`);
+        lines.push(`  Avg Latency:  ${t.avgLatencyMs.toFixed(3)} ms`);
+        lines.push(`  Stddev:       ${t.stddevLatencyMs.toFixed(3)} ms`);
+        lines.push(`  Min/Max:      ${t.minLatencyMs.toFixed(3)} / ${t.maxLatencyMs.toFixed(3)} ms`);
+        lines.push('');
+      }
+    } else {
+      const f = run.result as FioBenchResult;
+      lines.push(`StorageClass: ${f.config.storageClass}  |  PVC: ${f.config.pvcSize}  |  I/O depth: ${f.config.ioDepth}  |  Jobs: ${f.config.numJobs}`);
+      lines.push('');
+      for (const t of f.results) {
+        lines.push(`--- ${t.label} ---`);
+        lines.push(`  Throughput:   ${t.throughputMBs.toFixed(2)} MB/s`);
+        lines.push(`  IOPS:         ${t.iops.toFixed(0)}`);
+        lines.push(`  Avg Latency:  ${t.avgLatencyUs.toFixed(1)} μs`);
+        lines.push(`  P50 Latency:  ${t.p50LatencyUs.toFixed(1)} μs`);
+        lines.push(`  P95 Latency:  ${t.p95LatencyUs.toFixed(1)} μs`);
+        lines.push(`  P99 Latency:  ${t.p99LatencyUs.toFixed(1)} μs`);
+        lines.push('');
+      }
+    }
+  }
+
+  if (run.error) {
+    lines.push('=== ERROR ===');
+    lines.push(run.error);
+    lines.push('');
+  }
+
+  if (run.logs) {
+    lines.push('=== FULL LOG ===');
+    lines.push(run.logs);
+  }
+
+  return lines.join('\n');
+}
+
+export function downloadRunOutput(run: BenchmarkRun): void {
+  const content = buildDownloadContent(run);
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const ts = new Date(run.timestamp).toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  a.download = `storage-bench-${run.benchmarkType}-${ts}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 const BenchmarkResults: FC<BenchmarkResultsProps> = ({ run, previousRun }) => {
   if (!run.result) return null;
 
@@ -277,9 +349,19 @@ const BenchmarkResults: FC<BenchmarkResultsProps> = ({ run, previousRun }) => {
       ? previousRun.result
       : undefined;
 
+  const handleDownload = useCallback(() => downloadRunOutput(run), [run]);
+
   if (run.result.type === 'rados') {
     return (
       <>
+        <Split hasGutter className="sb-results-header">
+          <SplitItem isFilled />
+          <SplitItem>
+            <Button variant="secondary" icon={<DownloadIcon />} onClick={handleDownload}>
+              Download
+            </Button>
+          </SplitItem>
+        </Split>
         <RadosResults
           result={run.result}
           prev={prevResult as RadosBenchResult | undefined}
@@ -291,6 +373,14 @@ const BenchmarkResults: FC<BenchmarkResultsProps> = ({ run, previousRun }) => {
 
   return (
     <>
+      <Split hasGutter className="sb-results-header">
+        <SplitItem isFilled />
+        <SplitItem>
+          <Button variant="secondary" icon={<DownloadIcon />} onClick={handleDownload}>
+            Download
+          </Button>
+        </SplitItem>
+      </Split>
       <FioResults
         result={run.result as FioBenchResult}
         prev={prevResult as FioBenchResult | undefined}

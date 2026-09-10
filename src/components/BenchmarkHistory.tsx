@@ -15,7 +15,7 @@ import {
   FlexItem,
   Tooltip,
 } from '@patternfly/react-core';
-import { SearchIcon, TrashIcon } from '@patternfly/react-icons';
+import { SearchIcon, TrashIcon, DownloadIcon } from '@patternfly/react-icons';
 import {
   Table,
   Thead,
@@ -31,7 +31,7 @@ import {
   FIO_WORKLOADS,
 } from '../utils/benchmark-types';
 import { deleteResult } from '../utils/benchmark-api';
-import BenchmarkResults from './BenchmarkResults';
+import BenchmarkResults, { downloadRunOutput } from './BenchmarkResults';
 import BenchmarkComparison from './BenchmarkComparison';
 
 const RADOS_MODE_LABELS: Record<string, string> = {
@@ -49,6 +49,9 @@ function getWorkloadSummary(run: BenchmarkRun): string {
   const f = run.result as FioBenchResult;
   return f.results
     .map((t) => {
+      if (t.workloadId === 'custom') {
+        return t.label || 'Custom';
+      }
       const profile = FIO_WORKLOADS.find((w) => w.id === t.workloadId);
       const label = profile ? profile.label : t.label || t.workloadId;
       const bs = profile?.bs ? ` (${profile.bs})` : '';
@@ -268,6 +271,13 @@ const BenchmarkHistory: FC<BenchmarkHistoryProps> = ({ runs, onDelete }) => {
                     {t('View')}
                   </Button>
                 )}
+                <Button
+                  variant="plain"
+                  aria-label={t('Download')}
+                  onClick={() => downloadRunOutput(run)}
+                >
+                  <DownloadIcon />
+                </Button>
                 <Button
                   variant="plain"
                   aria-label={t('Delete')}

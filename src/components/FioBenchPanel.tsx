@@ -18,17 +18,24 @@ import {
   Progress,
   ProgressMeasureLocation,
   TextInput,
+  Popover,
+  NumberInput,
+  Radio,
+  FormGroupLabelHelp,
 } from '@patternfly/react-core';
 import {
   FioBenchConfig,
   FioWorkloadId,
+  FioCustomWorkloadConfig,
   BenchmarkRun,
   StorageClassInfo,
   FIO_DEFAULTS,
+  FIO_CUSTOM_DEFAULTS,
   FIO_WORKLOADS,
   FIO_PVC_SIZE_OPTIONS,
   FIO_IODEPTH_OPTIONS,
   FIO_JOBS_OPTIONS,
+  FIO_BLOCK_SIZE_OPTIONS,
 } from '../utils/benchmark-types';
 import {
   listStorageClasses,
@@ -57,6 +64,8 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
   const { t } = useTranslation('plugin__oct-storage-bench');
 
   const [config, setConfig] = useState<FioBenchConfig>({ ...FIO_DEFAULTS });
+  const [customEnabled, setCustomEnabled] = useState(false);
+  const [customConfig, setCustomConfig] = useState<FioCustomWorkloadConfig>({ ...FIO_CUSTOM_DEFAULTS });
   const [description, setDescription] = useState('');
   const [storageClasses, setStorageClasses] = useState<StorageClassInfo[]>([]);
   const [scLoading, setScLoading] = useState(true);
@@ -100,6 +109,16 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
 
   const toggleWorkload = useCallback(
     (id: FioWorkloadId, checked: boolean) => {
+      if (id === 'custom') {
+        setCustomEnabled(checked);
+        setConfig((prev) => ({
+          ...prev,
+          workloads: checked
+            ? [...prev.workloads.filter((w) => w !== 'custom'), 'custom']
+            : prev.workloads.filter((w) => w !== 'custom'),
+        }));
+        return;
+      }
       setConfig((prev) => ({
         ...prev,
         workloads: checked
@@ -123,7 +142,12 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
     let benchId: string | null = null;
 
     try {
-      const { id } = await startFioBench({ ...config, description: description || undefined });
+      const fioConfig: FioBenchConfig = {
+        ...config,
+        description: description || undefined,
+        customWorkload: customEnabled ? customConfig : undefined,
+      };
+      const { id } = await startFioBench(fioConfig);
       benchId = id;
       setRunningId(id);
 
@@ -180,7 +204,7 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
       setCancelling(false);
       onBenchmarkStopped();
     }
-  }, [config, description, onRunComplete, onBenchmarkStarted, onBenchmarkStopped]);
+  }, [config, customEnabled, customConfig, description, onRunComplete, onBenchmarkStarted, onBenchmarkStopped]);
 
   const handleCancel = useCallback(async () => {
     if (!runningId) return;
@@ -269,10 +293,137 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
               </HelperText>
             </div>
           ))}
+          {/* Custom workload */}
+          <div className="sb-workload-check">
+            <Checkbox
+              id="fio-wl-custom"
+              label={t('Custom Workload')}
+              isChecked={customEnabled}
+              onChange={(_ev, checked) => toggleWorkload('custom', checked)}
+            />
+            <HelperText>
+              <HelperTextItem variant="indeterminate">
+                {t('Define your own block size, access pattern, and duration')}
+              </HelperTextItem>
+            </HelperText>
+          </div>
+          {customEnabled && (
+            <div className="sb-custom-workload-config">
+              <FormGroup label={t('Block size')} fieldId="custom-bs">
+                <FormSelect
+                  id="custom-bs"
+                  value={customConfig.bs}
+                  onChange={(_ev, val) => setCustomConfig((prev) => ({ ...prev, bs: val }))}
+                >
+                  {FIO_BLOCK_SIZE_OPTIONS.map((v) => (
+                    <FormSelectOption key={v} value={v} label={v} />
+                  ))}
+                </FormSelect>
+              </FormGroup>
+
+              <FormGroup label={t('Access pattern')} fieldId="custom-pattern" role="radiogroup">
+                <Radio
+                  id="custom-pattern-random"
+                  name="custom-pattern"
+                  label={t('Random')}
+                  isChecked={customConfig.pattern === 'random'}
+                  onChange={() => setCustomConfig((prev) => ({ ...prev, pattern: 'random' }))}
+                />
+                <Radio
+                  id="custom-pattern-sequential"
+                  name="custom-pattern"
+                  label={t('Sequential')}
+                  isChecked={customConfig.pattern === 'sequential'}
+                  onChange={() => setCustomConfig((prev) => ({ ...prev, pattern: 'sequential' }))}
+                />
+              </FormGroup>
+
+              <FormGroup label={t('Operation')} fieldId="custom-operation" role="radiogroup">
+                <Radio
+                  id="custom-op-read"
+                  name="custom-operation"
+                  label={t('Read')}
+                  isChecked={customConfig.operation === 'read'}
+                  onChange={() => setCustomConfig((prev) => ({ ...prev, operation: 'read' }))}
+                />
+                <Radio
+                  id="custom-op-write"
+                  name="custom-operation"
+                  label={t('Write')}
+                  isChecked={customConfig.operation === 'write'}
+                  onChange={() => setCustomConfig((prev) => ({ ...prev, operation: 'write' }))}
+                />
+                <Radio
+                  id="custom-op-mixed"
+                  name="custom-operation"
+                  label={t('Mixed')}
+                  isChecked={customConfig.operation === 'mixed'}
+                  onChange={() => setCustomConfig((prev) => ({ ...prev, operation: 'mixed' }))}
+                />
+              </FormGroup>
+
+              {customConfig.operation === 'mixed' && (
+                <FormGroup label={t('Read percentage')} fieldId="custom-rwmixread">
+                  <NumberInput
+                    id="custom-rwmixread"
+                    value={customConfig.rwmixread}
+                    min={1}
+                    max={99}
+                    onMinus={() => setCustomConfig((prev) => ({ ...prev, rwmixread: Math.max(1, prev.rwmixread - 5) }))}
+                    onPlus={() => setCustomConfig((prev) => ({ ...prev, rwmixread: Math.min(99, prev.rwmixread + 5) }))}
+                    onChange={(ev) => {
+                      const val = Number((ev.target as HTMLInputElement).value);
+                      if (!isNaN(val) && val >= 1 && val <= 99) {
+                        setCustomConfig((prev) => ({ ...prev, rwmixread: val }));
+                      }
+                    }}
+                  />
+                  <HelperText>
+                    <HelperTextItem variant="indeterminate">
+                      {t('{{read}}% read / {{write}}% write', { read: customConfig.rwmixread, write: 100 - customConfig.rwmixread })}
+                    </HelperTextItem>
+                  </HelperText>
+                </FormGroup>
+              )}
+
+              <FormGroup label={t('Test duration (seconds)')} fieldId="custom-duration">
+                <NumberInput
+                  id="custom-duration"
+                  value={customConfig.duration}
+                  min={5}
+                  max={3600}
+                  onMinus={() => setCustomConfig((prev) => ({ ...prev, duration: Math.max(5, prev.duration - 10) }))}
+                  onPlus={() => setCustomConfig((prev) => ({ ...prev, duration: Math.min(3600, prev.duration + 10) }))}
+                  onChange={(ev) => {
+                    const val = Number((ev.target as HTMLInputElement).value);
+                    if (!isNaN(val) && val >= 5 && val <= 3600) {
+                      setCustomConfig((prev) => ({ ...prev, duration: val }));
+                    }
+                  }}
+                />
+                <HelperText>
+                  <HelperTextItem variant="indeterminate">
+                    {t('How long the workload runs (5–3600s). Longer runs give more stable results.')}
+                  </HelperTextItem>
+                </HelperText>
+              </FormGroup>
+            </div>
+          )}
         </FormGroup>
 
         {/* I/O depth */}
-        <FormGroup label={t('I/O depth')} fieldId="fio-iodepth">
+        <FormGroup
+          label={t('I/O depth')}
+          fieldId="fio-iodepth"
+          labelHelp={
+            <Popover
+              headerContent={t('I/O Depth')}
+              bodyContent={t('The number of I/O requests to keep in flight at the same time. Higher values push the storage harder and reveal peak throughput, but may increase latency. Low values (1–4) simulate single-threaded applications; high values (32–128) simulate parallel workloads like databases.')}
+            >
+              <FormGroupLabelHelp aria-label={t('I/O depth help')} />
+            </Popover>
+          }
+        >
           <FormSelect
             id="fio-iodepth"
             value={String(config.ioDepth)}
@@ -287,7 +438,18 @@ const FioBenchPanel: FC<FioBenchPanelProps> = ({
         </FormGroup>
 
         {/* Threads/jobs */}
-        <FormGroup label={t('Threads/jobs')} fieldId="fio-jobs">
+        <FormGroup
+          label={t('Threads/jobs')}
+          fieldId="fio-jobs"
+          labelHelp={
+            <Popover
+              headerContent={t('Threads / Jobs')}
+              bodyContent={t('The number of parallel FIO worker processes. Each job independently generates I/O against the storage. More jobs simulate more concurrent users or application threads. Typical values: 1 for single-thread baseline, 4–8 for moderate concurrency, 16+ for heavy parallel loads.')}
+            >
+              <FormGroupLabelHelp aria-label={t('Threads help')} />
+            </Popover>
+          }
+        >
           <FormSelect
             id="fio-jobs"
             value={String(config.numJobs)}

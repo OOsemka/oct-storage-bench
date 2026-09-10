@@ -19,15 +19,25 @@ import (
 
 const defaultFioDuration = 30
 
+// FioCustomWorkload describes a user-defined workload profile.
+type FioCustomWorkload struct {
+	BS        string `json:"bs"`
+	Pattern   string `json:"pattern"`   // "random" or "sequential"
+	Operation string `json:"operation"` // "read", "write", "mixed"
+	RWMixRead int    `json:"rwmixread"`
+	Duration  int    `json:"duration"`
+}
+
 // FioBenchRequest is the JSON body for POST /api/v1/bench/fio.
 type FioBenchRequest struct {
-	StorageClass string   `json:"storageClass"`
-	PvcSize      string   `json:"pvcSize"`
-	Workloads    []string `json:"workloads"`
-	IODepth      int      `json:"ioDepth"`
-	NumJobs      int      `json:"numJobs"`
-	Duration     int      `json:"duration,omitempty"`
-	Description  string   `json:"description,omitempty"`
+	StorageClass   string             `json:"storageClass"`
+	PvcSize        string             `json:"pvcSize"`
+	Workloads      []string           `json:"workloads"`
+	IODepth        int                `json:"ioDepth"`
+	NumJobs        int                `json:"numJobs"`
+	Duration       int                `json:"duration,omitempty"`
+	Description    string             `json:"description,omitempty"`
+	CustomWorkload *FioCustomWorkload `json:"customWorkload,omitempty"`
 }
 
 // FioTestResult holds parsed FIO JSON output for one workload.
@@ -190,9 +200,47 @@ func runFioBench(job *benchmarkJob, req FioBenchRequest) {
 	duration := req.Duration
 	var commands []string
 	for i, wl := range req.Workloads {
-		cfg, ok := workloadConfigs[wl]
-		if !ok {
-			continue
+		var cfg fioArgs
+		wlDuration := duration
+
+		if wl == "custom" && req.CustomWorkload != nil {
+			cw := req.CustomWorkload
+			cfg.bs = cw.BS
+			switch {
+			case cw.Pattern == "random" && cw.Operation == "read":
+				cfg.rw = "randread"
+			case cw.Pattern == "random" && cw.Operation == "write":
+				cfg.rw = "randwrite"
+			case cw.Pattern == "random" && cw.Operation == "mixed":
+				cfg.rw = "randrw"
+				cfg.rwmixread = cw.RWMixRead
+			case cw.Pattern == "sequential" && cw.Operation == "read":
+				cfg.rw = "read"
+			case cw.Pattern == "sequential" && cw.Operation == "write":
+				cfg.rw = "write"
+			case cw.Pattern == "sequential" && cw.Operation == "mixed":
+				cfg.rw = "rw"
+				cfg.rwmixread = cw.RWMixRead
+			default:
+				cfg.rw = "randread"
+			}
+			if cw.Duration > 0 {
+				wlDuration = cw.Duration
+			}
+			if workloadLabels[wl] == "" {
+				workloadLabels[wl] = fmt.Sprintf("Custom (%s %s %s)", cw.BS, cw.Pattern, cw.Operation)
+			}
+		} else {
+			var ok bool
+			cfg, ok = workloadConfigs[wl]
+			if !ok {
+				continue
+			}
+		}
+		// Use custom duration if set, otherwise global
+		effectiveDuration := duration
+		if wl == "custom" && wlDuration > 0 {
+			effectiveDuration = wlDuration
 		}
 		// JSON result goes to a file (--output) so stdout stays clean for
 		// live ETA progress.  --eta=always forces ETA output without a TTY;
@@ -205,7 +253,7 @@ func runFioBench(job *benchmarkJob, req FioBenchRequest) {
 		// the result parser.
 		fioCmd := fmt.Sprintf(
 			"echo '=== FIO %s (%d/%d) ===' && fio --name=%s --ioengine=libaio --iodepth=%d --rw=%s --bs=%s --direct=1 --size=2G --numjobs=%d --runtime=%d --time_based --group_reporting --output-format=json --output=/tmp/fio-%s.json --eta=always --eta-newline=5 --directory=/data",
-			wl, i+1, totalWorkloads, wl, req.IODepth, cfg.rw, cfg.bs, req.NumJobs, duration, wl,
+			wl, i+1, totalWorkloads, wl, req.IODepth, cfg.rw, cfg.bs, req.NumJobs, effectiveDuration, wl,
 		)
 		if cfg.rwmixread > 0 {
 			fioCmd += fmt.Sprintf(" --rwmixread=%d", cfg.rwmixread)

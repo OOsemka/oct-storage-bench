@@ -11,7 +11,8 @@ export type FioWorkloadId =
   | 'rand-mixed'
   | 'seq-read'
   | 'seq-write'
-  | 'seq-mixed';
+  | 'seq-mixed'
+  | 'custom';
 
 /** Status of a running benchmark */
 export type BenchmarkStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
@@ -124,6 +125,25 @@ export const FIO_WORKLOADS: FioWorkloadProfile[] = [
   },
 ];
 
+/** User-defined custom workload parameters */
+export interface FioCustomWorkloadConfig {
+  bs: string;
+  pattern: 'random' | 'sequential';
+  operation: 'read' | 'write' | 'mixed';
+  rwmixread: number;
+  duration: number;
+}
+
+export const FIO_CUSTOM_DEFAULTS: FioCustomWorkloadConfig = {
+  bs: '4k',
+  pattern: 'random',
+  operation: 'read',
+  rwmixread: 70,
+  duration: 30,
+};
+
+export const FIO_BLOCK_SIZE_OPTIONS = ['512', '1k', '2k', '4k', '8k', '16k', '32k', '64k', '128k', '256k', '512k', '1M', '4M'];
+
 export interface FioBenchConfig {
   storageClass: string;
   pvcSize: string;
@@ -131,6 +151,7 @@ export interface FioBenchConfig {
   ioDepth: number;
   numJobs: number;
   description?: string;
+  customWorkload?: FioCustomWorkloadConfig;
 }
 
 export const FIO_DEFAULTS: FioBenchConfig = {
