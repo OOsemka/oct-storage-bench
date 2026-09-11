@@ -1,6 +1,6 @@
 {
   "name": "oct-storage-bench",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Community project. Storage benchmarking tool for the OpenShift Console. Run RADOS and FIO workloads. Not officially supported by Red Hat.",
   "private": true,
   "license": "Apache-2.0",
@@ -39,7 +39,7 @@
   },
   "consolePlugin": {
     "name": "oct-storage-bench",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "displayName": "Storage Bench",
     "description": "Community project. Storage benchmarking tool for the OpenShift Console. Run RADOS and FIO workloads. Not officially supported by Red Hat.",
     "exposedModules": {
