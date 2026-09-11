@@ -139,6 +139,16 @@ This plugin **does not** register the Community Tools section or hubs. Open from
 - Prefix new CSS `sb-`. Include `CommunityDisclaimer` on tool pages.
 - Disclaimer title: "Community project. Not officially supported by Red Hat."
 
+## Companion images
+
+The deploy bundle (`catalog/deploy/oct-storage-bench.yaml` in the storefront) references a sidecar image with its own independent version. When bumping either image, update both the deploy YAML and this section.
+
+| Image | Current version | Quay repo |
+| --- | --- | --- |
+| `oct-storage-bench-runner` | **0.1.2** | `quay.io/cjanisze/oct-storage-bench-runner` |
+
+The runner version should match the plugin version. After rebuilding either image, update the deploy YAML in the storefront, rebuild the storefront image, and run `scripts/validate-catalog.sh`. See `oct-release-checklist.mdc`.
+
 ## Do-not-break list
 
 - Route `/community-tools/storage/bench`
