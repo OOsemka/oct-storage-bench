@@ -2,7 +2,7 @@
 
 This is **OpenShift Community Tools (OCT)**, a **community project**, not an official Red Hat supported product. Do not describe it as official Red Hat software.
 
-This repository is the **Storage Bench** ConsolePlugin: a storage benchmarking tool for the OpenShift Console. Run RADOS bench and FIO workloads from the console UI, watch live output, and compare results over time. It is the first tool in the **Storage** category.
+This repository is the **Storage Bench** ConsolePlugin: a storage benchmarking tool for the OpenShift Console. Benchmark storage performance with FIO-based workloads against any storage backend. Includes RADOS tests for Ceph clusters. Compare results over time. It is the first tool in the **Storage** category.
 
 ## Identifiers
 

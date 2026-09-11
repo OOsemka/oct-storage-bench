@@ -2,7 +2,7 @@
 
 > **Community project.** This is not officially supported by Red Hat.
 
-A storage benchmarking tool for the OpenShift Console. Run RADOS bench (Ceph object store) and FIO (block storage) workloads directly from the console UI, watch live terminal output while tests run, and compare results over time with built-in history and charts.
+A storage benchmarking tool for the OpenShift Console. Benchmark storage performance with FIO-based workloads against any storage backend. Includes RADOS tests for Ceph clusters. Run benchmarks directly from the console UI, watch live terminal output while tests run, and compare results over time with built-in history and charts.
 
 ## Features
 
