@@ -141,3 +141,7 @@ yarn lint
 ## License
 
 Apache-2.0
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md): setup, `yarn verify`, testing on your own cluster, the project rules and what maintainers do at release.

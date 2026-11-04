@@ -29,7 +29,6 @@ import {
   startRadosBench,
   getBenchmarkStatus,
   cancelBenchmark,
-  getBenchmarkLogs,
 } from '../utils/benchmark-api';
 import BenchmarkResults from './BenchmarkResults';
 import LiveOutput from './LiveOutput';
