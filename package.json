@@ -11,7 +11,10 @@
     "start": "yarn webpack serve",
     "lint": "eslint src --fix --max-warnings 0",
     "ts-check": "tsc --noEmit",
-    "webpack": "webpack --config webpack.config.js"
+    "webpack": "webpack --config webpack.config.js",
+    "check-i18n": "node scripts/check-i18n.mjs",
+    "check-repo": "bash scripts/check-repo.sh",
+    "verify": "yarn ts-check && yarn check-i18n && yarn check-repo && yarn build"
   },
   "devDependencies": {
     "@openshift-console/dynamic-plugin-sdk": "4.21.0",

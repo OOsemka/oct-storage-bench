@@ -209,7 +209,7 @@ const StorageBenchPage: FC = () => {
                 <div className="sb-tile-stack">
                   {/* RADOS Bench tile */}
                   <BenchTile
-                    icon={<DatabaseIcon size="lg" />}
+                    icon={<DatabaseIcon />}
                     title={t('RADOS Bench')}
                     badge={t('Object Store')}
                     badgeColor={radosUnavailable ? 'grey' : 'blue'}
@@ -233,7 +233,7 @@ const StorageBenchPage: FC = () => {
 
                   {/* FIO Bench tile */}
                   <BenchTile
-                    icon={<TachometerAltIcon size="lg" />}
+                    icon={<TachometerAltIcon />}
                     title={t('FIO Bench')}
                     badge={t('Block Storage')}
                     badgeColor="purple"

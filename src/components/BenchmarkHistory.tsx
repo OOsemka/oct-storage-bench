@@ -8,6 +8,9 @@ import {
   Button,
   Label,
   Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   ModalVariant,
   Alert,
   Checkbox,
@@ -293,44 +296,43 @@ const BenchmarkHistory: FC<BenchmarkHistoryProps> = ({ runs, onDelete }) => {
 
       {selectedRun && (
         <Modal
-          title={`${selectedRun.benchmarkType === 'rados' ? t('RADOS') : t('FIO')} — ${new Date(selectedRun.timestamp).toLocaleString()}${selectedRun.description ? ` — ${selectedRun.description}` : ''}`}
           variant={ModalVariant.large}
           isOpen
           onClose={() => setSelectedRun(null)}
+          aria-labelledby="sb-result-modal-title"
         >
-          <div className="sb-result-detail">
-            <BenchmarkResults
-              run={selectedRun}
-              previousRun={findPreviousRun(selectedRun)}
-            />
-          </div>
+          <ModalHeader
+            labelId="sb-result-modal-title"
+            title={`${selectedRun.benchmarkType === 'rados' ? t('RADOS') : t('FIO')} — ${new Date(selectedRun.timestamp).toLocaleString()}${selectedRun.description ? ` — ${selectedRun.description}` : ''}`}
+          />
+          <ModalBody>
+            <div className="sb-result-detail">
+              <BenchmarkResults
+                run={selectedRun}
+                previousRun={findPreviousRun(selectedRun)}
+              />
+            </div>
+          </ModalBody>
         </Modal>
       )}
 
       {deleteId && (
         <Modal
-          title={t('Delete result')}
           variant={ModalVariant.small}
           isOpen
           onClose={() => setDeleteId(null)}
-          actions={[
-            <Button
-              key="confirm"
-              variant="danger"
-              onClick={() => handleDelete(deleteId)}
-            >
-              {t('Delete')}
-            </Button>,
-            <Button
-              key="cancel"
-              variant="link"
-              onClick={() => setDeleteId(null)}
-            >
-              {t('Cancel')}
-            </Button>,
-          ]}
+          aria-labelledby="sb-delete-modal-title"
         >
-          {t('Are you sure you want to delete this benchmark result?')}
+          <ModalHeader labelId="sb-delete-modal-title" title={t('Delete result')} />
+          <ModalBody>{t('Are you sure you want to delete this benchmark result?')}</ModalBody>
+          <ModalFooter>
+            <Button key="confirm" variant="danger" onClick={() => handleDelete(deleteId)}>
+              {t('Delete')}
+            </Button>
+            <Button key="cancel" variant="link" onClick={() => setDeleteId(null)}>
+              {t('Cancel')}
+            </Button>
+          </ModalFooter>
         </Modal>
       )}
     </div>

@@ -100,7 +100,7 @@ const RadosResults: FC<{
 
         return (
           <div key={r.mode} className="sb-form-section">
-            <Title headingLevel="h4" size="sm">
+            <Title headingLevel="h4">
               {modeLabel}
             </Title>
             <DescriptionList isHorizontal columnModifier={{ default: '2Col' }}>
@@ -179,7 +179,7 @@ const FioResults: FC<{
 
         return (
           <div key={r.workloadId} className="sb-form-section">
-            <Title headingLevel="h4" size="sm">
+            <Title headingLevel="h4">
               {t(r.label)}
             </Title>
             <DescriptionList isHorizontal columnModifier={{ default: '2Col' }}>

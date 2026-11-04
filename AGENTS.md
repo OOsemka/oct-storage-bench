@@ -167,5 +167,7 @@ Storefront `catalog/community.yaml`: `metadata.name: oct-storage-bench`, `consol
 
 ```bash
 yarn install
-yarn build
+yarn verify   # ts-check, check-i18n, check-repo, build (same as CI)
 ```
+
+`yarn check-i18n --fix` adds missing translation keys. Contributor workflow and the maintainer-only release steps: [CONTRIBUTING.md](CONTRIBUTING.md).
